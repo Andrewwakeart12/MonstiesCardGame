@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://bcwvek6vlgxli"]
+
+[ext_resource type="Texture2D" uid="uid://cy8v640co8s2u" path="res://assets/sprites/pirania.png" id="1_kikvd"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0xm2m"]
+size = Vector2(1008, 1470)
+
+[node name="Card" type="Node2D" unique_id=1633791062]
+scale = Vector2(0.071428575, 0.071428575)
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1569415375]
+texture = ExtResource("1_kikvd")
+
+[node name="Area2D" type="Area2D" parent="Sprite2D" unique_id=963909716]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D/Area2D" unique_id=59238024]
+position = Vector2(0, -1.333374)
+shape = SubResource("RectangleShape2D_0xm2m")
