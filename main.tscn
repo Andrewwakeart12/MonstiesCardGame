@@ -2,11 +2,21 @@
 
 [ext_resource type="Script" uid="uid://bon2fqscvj6ib" path="res://card_manager.gd" id="1_0xm2m"]
 [ext_resource type="PackedScene" uid="uid://bcwvek6vlgxli" path="res://card.tscn" id="2_h2yge"]
+[ext_resource type="Texture2D" uid="uid://bllt8v3a4nmf6" path="res://assets/sprites/grass_board.png" id="3_h2yge"]
 
 [node name="Main" type="Node2D" unique_id=1805310844]
+
+[node name="GrassBoard" type="Sprite2D" parent="." unique_id=1127448276]
+position = Vector2(673, 326.09375)
+scale = Vector2(0.16419068, 0.16066323)
+texture = ExtResource("3_h2yge")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=96588119]
+position = Vector2(382, 323)
+scale = Vector2(0.06773624, 0.06773626)
 
 [node name="CardManager" type="Node2D" parent="." unique_id=999130976]
 script = ExtResource("1_0xm2m")
 
-[node name="Card" parent="CardManager" unique_id=1633791062 instance=ExtResource("2_h2yge")]
-position = Vector2(145, 76)
+[node name="Card" parent="CardManager" unique_id=1582978151 instance=ExtResource("2_h2yge")]
+position = Vector2(40, 500)
