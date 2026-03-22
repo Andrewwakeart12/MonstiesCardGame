@@ -1,22 +1,41 @@
 [gd_scene format=3 uid="uid://cluyc22bda4y5"]
 
-[ext_resource type="Script" uid="uid://bon2fqscvj6ib" path="res://card_manager.gd" id="1_0xm2m"]
+[ext_resource type="Script" uid="uid://bon2fqscvj6ib" path="res://assets/sprites/card_manager.gd" id="1_0xm2m"]
+[ext_resource type="Texture2D" uid="uid://dsy3wduqsyrih" path="res://assets/sprites/card_field.png" id="1_h2yge"]
 [ext_resource type="PackedScene" uid="uid://bcwvek6vlgxli" path="res://card.tscn" id="2_h2yge"]
-[ext_resource type="Texture2D" uid="uid://bllt8v3a4nmf6" path="res://assets/sprites/grass_board.png" id="3_h2yge"]
+[ext_resource type="Texture2D" uid="uid://bk0lvc3q0cdhu" path="res://assets/sprites/card_monstie_holder.png" id="3_1bvp3"]
+[ext_resource type="Script" uid="uid://cxgxqtt4mangs" path="res://card_slot.gd" id="3_lquwl"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1bvp3"]
+size = Vector2(176, 221)
 
 [node name="Main" type="Node2D" unique_id=1805310844]
 
 [node name="GrassBoard" type="Sprite2D" parent="." unique_id=1127448276]
-position = Vector2(673, 326.09375)
-scale = Vector2(0.16419068, 0.16066323)
-texture = ExtResource("3_h2yge")
+position = Vector2(589.04144, 306)
+scale = Vector2(0.2090694, 0.19362804)
+texture = ExtResource("1_h2yge")
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=96588119]
-position = Vector2(382, 323)
-scale = Vector2(0.06773624, 0.06773626)
+[node name="Sprite2D2" type="Sprite2D" parent="GrassBoard" unique_id=96588119]
+position = Vector2(-990.3002, 87.79724)
+scale = Vector2(0.32398924, 0.34982672)
 
 [node name="CardManager" type="Node2D" parent="." unique_id=999130976]
 script = ExtResource("1_0xm2m")
 
+[node name="CardMonstieSlot" type="Node2D" parent="CardManager" unique_id=275938168]
+script = ExtResource("3_lquwl")
+
+[node name="CardSlotImage" type="Sprite2D" parent="CardManager/CardMonstieSlot" unique_id=838466791]
+position = Vector2(556, 348.42014)
+scale = Vector2(0.13643412, 0.13643406)
+texture = ExtResource("3_1bvp3")
+
+[node name="Area2D" type="Area2D" parent="CardManager/CardMonstieSlot" unique_id=1507646752]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CardManager/CardMonstieSlot/Area2D" unique_id=1936003147]
+position = Vector2(556, 347.5)
+shape = SubResource("RectangleShape2D_1bvp3")
+
 [node name="Card" parent="CardManager" unique_id=1582978151 instance=ExtResource("2_h2yge")]
-position = Vector2(40, 500)
+position = Vector2(42, 494.00003)

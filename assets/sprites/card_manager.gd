@@ -92,11 +92,15 @@ func _process(delta: float) -> void:
 		# Temblor suave en hover
 	
 
-func _input(event: InputEvent) -> void:
+func _input(event: InputEvent) :
 	if event is InputEventMouseButton and event.button_index == MouseButton.MOUSE_BUTTON_LEFT:
 		if event.pressed:
 			var card_dragged = raycast_check_for_card()
+
 			if card_dragged:
+				if(card_dragged.has_method('is_interactive_area')):
+					print("is_slot")
+					return false
 				dragging_card = card_dragged
 				
 				# Guardar posición original para posible retorno
@@ -117,7 +121,6 @@ func _input(event: InputEvent) -> void:
 			if dragging_card:
 				# Verificar si se soltó en un área interactiva
 				dropped_in_interactive_area = check_interactive_area(dragging_card)
-				
 				if not dropped_in_interactive_area:
 					# Iniciar animación de retorno
 					returning_card = dragging_card
@@ -136,12 +139,12 @@ func check_interactive_area(card: Node2D) -> bool:
 	var parameters = PhysicsPointQueryParameters2D.new()
 	parameters.position = card.global_position
 	parameters.collide_with_areas = true
-	
 	var result = space_state.intersect_point(parameters)
 	
 	for hit in result:
 		var collider = hit["collider"]
 		if collider:
+			collider = collider.get_parent()
 			# Verificar si el collider tiene la señal/método de área interactiva
 			if collider.has_method("is_interactive_area") and collider.is_interactive_area():
 				return true
@@ -172,8 +175,7 @@ func on_hovering_card(card):
 	pass
 func on_hovering_card_off(card):
 	pass
-
-func raycast_check_for_card():
+func raycast_check_for_slot():
 	var space_state = get_world_2d().direct_space_state
 	var parameters = PhysicsPointQueryParameters2D.new()
 	parameters.position = get_global_mouse_position()
@@ -181,6 +183,18 @@ func raycast_check_for_card():
 	
 	var result = space_state.intersect_point(parameters)
 	
+	if result.size() != 0:
+		var collider = result[0]["collider"] 
+		return collider.get_parent() if collider else null
+	else:
+		return null
+
+func raycast_check_for_card():
+	var space_state = get_world_2d().direct_space_state
+	var parameters = PhysicsPointQueryParameters2D.new()
+	parameters.position = get_global_mouse_position()
+	parameters.collide_with_areas = true
+	var result = space_state.intersect_point(parameters)
 	if result.size() != 0:
 		var collider = result[0]["collider"] 
 		return collider.get_parent() if collider else null
