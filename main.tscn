@@ -2,9 +2,9 @@
 
 [ext_resource type="Script" uid="uid://bon2fqscvj6ib" path="res://assets/sprites/card_manager.gd" id="1_0xm2m"]
 [ext_resource type="Texture2D" uid="uid://dsy3wduqsyrih" path="res://assets/sprites/card_field.png" id="1_h2yge"]
-[ext_resource type="PackedScene" uid="uid://bcwvek6vlgxli" path="res://card.tscn" id="2_h2yge"]
 [ext_resource type="Texture2D" uid="uid://bk0lvc3q0cdhu" path="res://assets/sprites/card_monstie_holder.png" id="3_1bvp3"]
 [ext_resource type="Script" uid="uid://cxgxqtt4mangs" path="res://card_slot.gd" id="3_lquwl"]
+[ext_resource type="Script" uid="uid://dn8iwlwoclrnj" path="res://player_hand.gd" id="6_7mycd"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1bvp3"]
 size = Vector2(176, 221)
@@ -22,6 +22,9 @@ scale = Vector2(0.32398924, 0.34982672)
 
 [node name="CardManager" type="Node2D" parent="." unique_id=999130976]
 script = ExtResource("1_0xm2m")
+angular_damping = 0.1
+tremor_speed = 6.8100000000000005
+return_animation_speed = 0.01
 
 [node name="CardMonstieSlot" type="Node2D" parent="CardManager" unique_id=275938168]
 script = ExtResource("3_lquwl")
@@ -37,5 +40,7 @@ texture = ExtResource("3_1bvp3")
 position = Vector2(556, 347.5)
 shape = SubResource("RectangleShape2D_1bvp3")
 
-[node name="Card" parent="CardManager" unique_id=1582978151 instance=ExtResource("2_h2yge")]
-position = Vector2(42, 494.00003)
+[node name="PlayerHand" type="Node2D" parent="." unique_id=1736493938]
+script = ExtResource("6_7mycd")
+HAND_COUNT = 5
+HAND_Y_POSITION = 500

@@ -15,7 +15,6 @@ var original_position: Vector2 = Vector2.ZERO
 var original_rotation: float = 0.0
 var return_progress: float = 0.0
 var dropped_in_interactive_area: bool = false
-
 # --- CONFIGURACIÓN ---
 @export var drag_smoothness: float = 0.1      	# Inercia de movimiento (0.05 = muy pesado, 1.0 = instantáneo)
 @export var rotation_force: float = 0.01      # Fuerza que aplica el movimiento a la rotación (ragdoll)
