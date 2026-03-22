@@ -39,7 +39,12 @@ var card_definition={
 	"speed":10, # from 3 to 50 for now (hidden)
 }
 func _ready() -> void:
-	get_parent().connect_card_signals(self)
+		# ✅ Verifica que el padre exista Y tenga el método
+	var parent = get_parent()
+	if parent and parent.has_method("connect_card_signals"):
+		parent.connect_card_signals(self)
+	else:
+		push_warning("⚠️ Card %s: parent no tiene connect_card_signals" % name)
 	pass # Replace with function body.
 func _process(delta: float) -> void:
 	pass
