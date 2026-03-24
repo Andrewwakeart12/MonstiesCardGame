@@ -1,11 +1,10 @@
-extends Node2D
+extends Node
 
-var allowed_cards = 1
+var dragged_card: Node2D = null
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	pass # Replace with function body.
-func is_interactive_area():
-	return true
+
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:

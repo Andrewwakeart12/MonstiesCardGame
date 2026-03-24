@@ -3,25 +3,80 @@
 [ext_resource type="Texture2D" uid="uid://cy8v640co8s2u" path="res://assets/sprites/pirania.png" id="1_kikvd"]
 [ext_resource type="Script" uid="uid://c3j54b0bypqqm" path="res://card.gd" id="1_rjlel"]
 
+[sub_resource type="Animation" id="Animation_rjlel"]
+length = 0.001
+tracks/0/type = "bezier"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:position:x")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+tracks/1/type = "bezier"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite2D:position:y")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"handle_modes": PackedInt32Array(0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0)
+}
+
+[sub_resource type="Animation" id="Animation_q5obu"]
+resource_name = "hovered"
+length = 8.466666
+capture_included = true
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:position")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.40000004),
+"transitions": PackedFloat32Array(0.32987696, 0.32987696),
+"update": 2,
+"values": [Vector2(0, 7.5), Vector2(0, -100)]
+}
+
+[sub_resource type="Animation" id="Animation_e484p"]
+resource_name = "new_animation"
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_e484p"]
+_data = {
+&"RESET": SubResource("Animation_rjlel"),
+&"hovered": SubResource("Animation_q5obu"),
+&"new_animation": SubResource("Animation_e484p")
+}
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0xm2m"]
 size = Vector2(1008, 1486.6669)
 
 [node name="Card" type="Node2D" unique_id=1633791062]
+position = Vector2(0, 7.5)
 scale = Vector2(0.071428575, 0.071428575)
 script = ExtResource("1_rjlel")
 
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1669841463]
+libraries/ = SubResource("AnimationLibrary_e484p")
+
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1569415375]
-position = Vector2(497, 728.54156)
 scale = Vector2(1.9583334, 1.9583333)
 texture = ExtResource("1_kikvd")
 
-[node name="Area2D" type="Area2D" parent="." unique_id=963909716]
+[node name="DraggingArea" type="Area2D" parent="." unique_id=963909716]
 position = Vector2(497, 728.54156)
 scale = Vector2(1.9583334, 1.9583334)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=59238024]
-position = Vector2(0, -1.3333664)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DraggingArea" unique_id=59238024]
+position = Vector2(-260.93616, -389.89355)
 shape = SubResource("RectangleShape2D_0xm2m")
 
-[connection signal="mouse_entered" from="Area2D" to="." method="_on_area_2d_mouse_entered"]
-[connection signal="mouse_exited" from="Area2D" to="." method="_on_area_2d_mouse_exited"]
+[connection signal="mouse_entered" from="DraggingArea" to="." method="_on_area_2d_mouse_entered"]
+[connection signal="mouse_exited" from="DraggingArea" to="." method="_on_area_2d_mouse_exited"]

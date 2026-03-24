@@ -1,6 +1,7 @@
 extends Node2D
 
-var dragging_card: Node2D = null
+signal card_dropped_in_slot(card)
+signal reset_cards_position
 var drag_offset: Vector2 = Vector2.ZERO
 var shake_intensity: float = 0.0
 
@@ -34,7 +35,7 @@ func _ready() -> void:
 	pass 
 
 func _process(delta: float) -> void:
-	if dragging_card:
+	if Global.dragged_card:
 		var mouse_pos = get_global_mouse_position()
 		var target_pos = mouse_pos + drag_offset
 		
@@ -43,28 +44,28 @@ func _process(delta: float) -> void:
 		previous_mouse_pos = mouse_pos
 		
 		# 2. Movimiento con Inercia (Lerp)
-		dragging_card.global_position = dragging_card.global_position.lerp(target_pos, drag_smoothness)
+		Global.dragged_card.global_position = Global.dragged_card.global_position.lerp(target_pos, drag_smoothness)
 		
 		# 3. Rotación tipo Ragdoll (interactúa con el movimiento DURANTE el drag)
 		var force = mouse_velocity.x * rotation_force
 		angular_velocity += force
 		angular_velocity *= angular_damping
-		dragging_card.rotation += angular_velocity
+		Global.dragged_card.rotation += angular_velocity
 		
 		# Fuerza de retorno a 0 cuando la velocidad es baja
 		if abs(mouse_velocity.length()) < 5.0:
-			dragging_card.rotation = lerp_angle(dragging_card.rotation, 0.0, rotation_return_speed)
+			Global.dragged_card.rotation = lerp_angle(Global.dragged_card.rotation, 0.0, rotation_return_speed)
 		
 		# Limitar rotación máxima
 		var max_rot = deg_to_rad(max_rotation_deg)
-		dragging_card.rotation = clamp(dragging_card.rotation, -max_rot, max_rot)
+		Global.dragged_card.rotation = clamp(Global.dragged_card.rotation, -max_rot, max_rot)
 		
 		# 4. Límites de Pantalla (Sin espacio muerto)
-		clamp_card_to_screen(dragging_card)
+		clamp_card_to_screen(Global.dragged_card)
 		
 		# 5. Temblor Momentáneo (Decaimiento)
 		if shake_intensity > 0:
-			dragging_card.rotation += randf_range(-shake_strength, shake_strength)
+			Global.dragged_card.rotation += randf_range(-shake_strength, shake_strength)
 			shake_intensity -= delta
 			
 	elif returning_card:
@@ -95,19 +96,19 @@ func _input(event: InputEvent) :
 	if event is InputEventMouseButton and event.button_index == MouseButton.MOUSE_BUTTON_LEFT:
 		if event.pressed:
 			var card_dragged = raycast_check_for_card()
-
-			if card_dragged:
+			if card_dragged :
 				if(card_dragged.has_method('is_interactive_area')):
 					print("is_slot")
 					return false
-				dragging_card = card_dragged
-				
+				if(!card_dragged.onTop):
+					return false
+				Global.dragged_card = card_dragged
 				# Guardar posición original para posible retorno
-				original_position = dragging_card.global_position
-				original_rotation = dragging_card.rotation
+				original_position = Global.dragged_card.global_position
+				original_rotation = Global.dragged_card.rotation
 				
 				# Calcular offset exacto donde se agarró la carta
-				drag_offset = dragging_card.global_position - get_global_mouse_position()
+				drag_offset = Global.dragged_card.global_position - get_global_mouse_position()
 				
 				# Resetear física para evitar saltos
 				previous_mouse_pos = get_global_mouse_position()
@@ -117,18 +118,16 @@ func _input(event: InputEvent) :
 				# ACTIVAR TEMBLOR MOMENTÁNEO
 				shake_intensity = shake_duration
 		else:
-			if dragging_card:
+			if Global.dragged_card:
 				# Verificar si se soltó en un área interactiva
-				dropped_in_interactive_area = check_interactive_area(dragging_card)
+				dropped_in_interactive_area = check_interactive_area(Global.dragged_card)
 				if not dropped_in_interactive_area:
-					# Iniciar animación de retorno
-					returning_card = dragging_card
-					# original_position ya está guardado desde el inicio del drag
+					reset_cards_position.emit()
 				else:
-					# La carta se queda en su posición (fue droppeada exitosamente)
+					card_dropped_in_slot.emit(Global.dragged_card)
 					pass
 				
-				dragging_card = null
+				Global.dragged_card = null
 				drag_offset = Vector2.ZERO
 			
 

@@ -21,7 +21,7 @@ signal hovering_off
 	#3 calamity (adventages potenciated)
 # any advantage its a disaventage if the weather its a rival one for example water > fire > grass > earth
 #all games start in neutral grass or field state
-
+var onTop = false
 #card object definition
 var card_definition={
 	"type":'monstie',
@@ -52,9 +52,13 @@ func _process(delta: float) -> void:
 
 func _on_area_2d_mouse_entered() -> void:
 	emit_signal('hovered',self)
+	if(onTop):
+		$AnimationPlayer.play("hovered")
 	pass # Replace with function body.
 
 
 func _on_area_2d_mouse_exited() -> void:
 	emit_signal('hovering_off',self)
+	if(onTop):
+		$AnimationPlayer.play_backwards("hovered")
 	pass # Replace with function body.

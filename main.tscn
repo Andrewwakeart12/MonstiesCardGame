@@ -38,5 +38,7 @@ shape = SubResource("RectangleShape2D_1bvp3")
 
 [node name="PlayerHand" type="Node2D" parent="." unique_id=1736493938]
 script = ExtResource("6_7mycd")
-HAND_COUNT = 5
 HAND_Y_POSITION = 500
+
+[connection signal="card_dropped_in_slot" from="CardManager" to="PlayerHand" method="_on_slot_receive_card"]
+[connection signal="reset_cards_position" from="CardManager" to="PlayerHand" method="_on_card_manager_reset_cards_position"]
