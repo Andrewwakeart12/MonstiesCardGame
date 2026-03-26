@@ -12,6 +12,7 @@ size = Vector2(176, 221)
 [node name="Main" type="Node2D" unique_id=1805310844]
 
 [node name="GrassBoard" type="Sprite2D" parent="." unique_id=1127448276]
+visible = false
 position = Vector2(581, 302)
 scale = Vector2(0.2090694, 0.19362804)
 texture = ExtResource("1_h2yge")

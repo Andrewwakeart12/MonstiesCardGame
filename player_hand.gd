@@ -6,7 +6,7 @@ const CARD_SCENE_PATH = 'res://card.tscn'
 var player_hand = []
 var center_screen_x
 const CARD_WIDTH = 20
-
+var card_scene
 # ✅ Opacidad base y rango ajustado para que todas sean visibles
 var card_base_opacity = 1.0
 var card_opacity_fade = 0.05  # Valor más razonable
@@ -15,7 +15,7 @@ func _ready() -> void:
 	var viewport_width = get_viewport().size.x
 	center_screen_x = viewport_width * 0.75  # Tu lógica original: viewport - viewport/4
 	
-	var card_scene = preload(CARD_SCENE_PATH)
+	card_scene = preload(CARD_SCENE_PATH)
 	for i in range(HAND_COUNT):
 		var new_card = card_scene.instantiate()
 		new_card.name = "Card_%s" % i
@@ -23,22 +23,27 @@ func _ready() -> void:
 		add_card_to_hand(new_card)
 		set_card_z_index(new_card,i,HAND_COUNT)
 	confTopItem()
-#	tcard.collider.global_position.y += int(400)
+
 func _on_slot_receive_card(card):
 	takeout_of_hand(card)
 	pass
+
 func add_card_to_hand(card):
 	player_hand.insert(player_hand.size(), card)  # Inserta al inicio
 	await update_hand_position()
+
 func set_card_z_index(card,index,max_range):
 	var z_index = max_range
 	z_index = int(z_index) + int(max_range - index)  
 	card.z_index=z_index
 	pass
+
 func confTopItem():
 	var tcard= confirmOnStackTop()
-	tcard.onTop = true
-	tcard.get_node("DraggingArea").set_deferred("disabled", false)
+	if tcard:
+		tcard.onTop = true
+		tcard.get_node("DraggingArea").set_deferred("disabled", false)
+
 func update_hand_position():
 	for i in range(player_hand.size()):
 		var new_position = Vector2(calculate_card_position(i), HAND_Y_POSITION)
@@ -48,7 +53,6 @@ func update_hand_position():
 		animate_card_position_and_opacity(card, new_position, new_opacity)
 		confTopItem()
 	
-		
 func calculate_card_position(index):
 	# ✅ PARÉNTESIS CORRECTOS:
 	var total_width = (player_hand.size() - 1) * CARD_WIDTH
@@ -67,27 +71,105 @@ func animate_card_position_and_opacity(card, new_position, new_opacity):
 	tween.tween_property(card, "position", new_position, 0.15)
 	tween.tween_property(card, "rotation", 0, 0.15)
 	tween.tween_property(card, "modulate:a", new_opacity, 0.15)
-	#looks faster 
-	#tween.tween_property(card, "skew", deg_to_rad(14.2), 0.15)
+
 func confirmOnStackTop():
-	if player_hand is Array:
+	if player_hand is Array and player_hand.size() > 0:
 		return player_hand[0]
 	elif player_hand == null:
-		return false
+		return null
 	else:
 		return player_hand
+
+# ✅ CORREGIDO: Usa vanish_card_and_self_remove en lugar de eliminar directamente
 func takeout_of_hand(card):
-	player_hand.erase(card)
-	player_hand.filter(func(item): return item.name == card.name)
-	update_hand_position()
-	pass
+	if card in player_hand and not card.get_meta("removing", false):
+		vanish_card_and_self_remove(card)
+
 func _input(event: InputEvent) -> void:
 	if Input.is_key_pressed(KEY_R):
 		update_hand_position()
 	if Input.is_key_pressed(KEY_P):
-		takeout_of_hand(Global.dragged_card)
+		if Global.dragged_card and Global.dragged_card in player_hand:
+			vanish_card_and_self_remove(Global.dragged_card)
+	if Input.is_key_pressed(KEY_A):
+		add_card_to_decK()
+	if Input.is_key_pressed(KEY_D):
+		remove_from_deck()
 
+func add_card_to_decK():
+	var new_card = card_scene.instantiate()
+	new_card.name = "Card_%s" % player_hand.size()
+	self.add_child(new_card)
+	add_card_to_hand(new_card)
+	set_card_z_index(new_card,player_hand.size(),HAND_COUNT)
+	pass
+
+# ============================================================================
+# ✅ FUNCIONES CORREGIDAS PARA VANISH (Sin señales, sin flags, solo Tween)
+# ============================================================================
+
+func vanish_card_and_self_remove(card: Node2D) -> void:
+	"""
+	Animación de desaparición NO BLOQUEANTE usando Tween.
+	Cada carta gestiona su propia animación y eliminación.
+	"""
+	# Prevenir eliminación duplicada
+	if not is_instance_valid(card) or card.get_meta("removing", false):
+		return
+	card.set_meta("removing", true)
+	
+	# Desactivar interacciones inmediatamente
+	if card.has_node("DraggingArea"):
+		card.get_node("DraggingArea").set_deferred("disabled", true)
+	
+	# ✅ Crear Tween para la animación
+	var tween = create_tween()
+	# Animar opacidad a 0 (efecto vanish)
+	tween.tween_property(card.get_node('Sprite2D'), "position", Vector2(card.position.x,card.position.y - 40), 1).from_current()
+	tween.set_parallel()
+	tween.tween_property(card.get_node('Sprite2D'), "modulate:a", 0.0, 1)
+	
+	# ✅ Callback que se ejecuta AL FINALIZAR la animación
+	# Esto reemplaza la necesidad de señales y ConnectionFlags
+	tween.tween_callback(_finalize_card_removal.bind(card))
+	
+	# ✅ Esta función retorna INMEDIATAMENTE → UI responsiva
+
+func _finalize_card_removal(card: Node2D) -> void:
+	"""
+	Limpieza segura: remueve del array, del árbol y libera memoria.
+	"""
+	if not is_instance_valid(card):
+		return
+	
+	# Remover del array de la mano
+	var idx = player_hand.find(card)
+	if idx != -1:
+		player_hand.remove_at(idx)
+	
+	# Remover del árbol de nodos y liberar
+	if card.get_parent():
+		card.get_parent().remove_child(card)
+	card.queue_free()
+	
+	# Actualizar posición de las cartas restantes
+	update_hand_position()
+
+func remove_from_deck() -> void:
+	"""
+	Elimina la última carta del mazo con animación NO BLOQUEANTE.
+	"""
+	if player_hand.is_empty():
+		return
+	var last_element = player_hand[-1]
+	
+	# ✅ Iniciar animación sin await → retorna inmediatamente
+	vanish_card_and_self_remove(last_element)
+
+# ============================================================================
+# FIN DE FUNCIONES CORREGIDAS
+# ============================================================================
 
 func _on_card_manager_reset_cards_position() -> void:
 	update_hand_position()
-	pass # Replace with function body.
+	pass

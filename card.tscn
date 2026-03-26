@@ -5,6 +5,7 @@
 
 [sub_resource type="Animation" id="Animation_rjlel"]
 length = 0.001
+capture_included = true
 tracks/0/type = "bezier"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -27,6 +28,30 @@ tracks/1/keys = {
 "points": PackedFloat32Array(0, -0.25, 0, 0.25, 0),
 "times": PackedFloat32Array(0)
 }
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Sprite2D:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 2,
+"values": [Vector2(0, -100)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Sprite2D:modulate")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
 
 [sub_resource type="Animation" id="Animation_q5obu"]
 resource_name = "hovered"
@@ -48,11 +73,40 @@ tracks/0/keys = {
 [sub_resource type="Animation" id="Animation_e484p"]
 resource_name = "new_animation"
 
+[sub_resource type="Animation" id="Animation_fpac0"]
+resource_name = "vanish"
+capture_included = true
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.1035, 0.9),
+"transitions": PackedFloat32Array(1.7411021, 0.28717437),
+"update": 2,
+"values": [Vector2(0, 0), Vector2(0, -400)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite2D:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0.16666667, 1),
+"transitions": PackedFloat32Array(0.25000006, 4.141059),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_e484p"]
 _data = {
 &"RESET": SubResource("Animation_rjlel"),
 &"hovered": SubResource("Animation_q5obu"),
-&"new_animation": SubResource("Animation_e484p")
+&"new_animation": SubResource("Animation_e484p"),
+&"vanish": SubResource("Animation_fpac0")
 }
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0xm2m"]
@@ -67,6 +121,7 @@ script = ExtResource("1_rjlel")
 libraries/ = SubResource("AnimationLibrary_e484p")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1569415375]
+position = Vector2(0, -100)
 scale = Vector2(1.9583334, 1.9583333)
 texture = ExtResource("1_kikvd")
 
