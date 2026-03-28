@@ -18,11 +18,7 @@ func _ready() -> void:
 	
 	card_scene = preload(CARD_SCENE_PATH)
 	for i in range(HAND_COUNT):
-		var new_card = card_scene.instantiate()
-		new_card.name = "Card_%s" % i
-		self.add_child(new_card)
-		add_card_to_hand(new_card)
-		set_card_z_index(new_card,i,HAND_COUNT)
+		add_card_to_decK()
 	confTopItem()
 
 func _on_slot_receive_card(card):
@@ -49,7 +45,7 @@ func confTopItem():
 	var tcard= confirmOnStackTop()
 	if ActiveCard:
 		tcard.onTop = true
-		tcard.get_node("DraggingArea").set_deferred("disabled", false)
+		
 func updated_hand_card_z_indexes():
 	var actual_index = player_hand.find(ActiveCard,0)
 	#array map example
@@ -219,6 +215,17 @@ func _on_card_manager_reset_cards_position() -> void:
 func _on_card_hover_off(card):
 	card.z_index = player_hand.size() + 1
 	pass
-func _on_card_hover_on(card):
+
+
+
+func _on_card_hovered(card) -> void:
+	card.original_z_index = card.z_index
 	card.z_index = player_hand.size() + 1
-	pass
+	print(card)
+	pass # Replace with function body.
+
+
+func _on_card_hovering_off(card) -> void:
+	card.z_index = card.original_z_index
+	print(card)
+	pass # Replace with function body.

@@ -1,6 +1,7 @@
 extends Node2D
 signal hovered
 signal hovering_off
+var original_z_index
 #game phases : 
 #1 draft , 
 #2 card play you can put terran and creature but not advantages , 
@@ -61,4 +62,8 @@ func _on_area_2d_mouse_exited() -> void:
 	emit_signal('hovering_off',self)
 	if(onTop):
 		$AnimationPlayer.play_backwards("hovered")
+	pass # Replace with function body.
+
+
+func _on_hovered() -> void:
 	pass # Replace with function body.
