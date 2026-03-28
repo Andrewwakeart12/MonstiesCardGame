@@ -6,6 +6,7 @@ const CARD_SCENE_PATH = 'res://card.tscn'
 var player_hand = []
 var center_screen_x
 const CARD_WIDTH = 20
+var ActiveCard
 var card_scene
 # ✅ Opacidad base y rango ajustado para que todas sean visibles
 var card_base_opacity = 1.0
@@ -38,21 +39,42 @@ func set_card_z_index(card,index,max_range):
 	card.z_index=z_index
 	pass
 
+func getActiveCard():
+	if(ActiveCard):
+		return ActiveCard
+	else:
+		return player_hand[0] 
+	pass
 func confTopItem():
 	var tcard= confirmOnStackTop()
-	if tcard:
+	if ActiveCard:
 		tcard.onTop = true
 		tcard.get_node("DraggingArea").set_deferred("disabled", false)
-
+func updated_hand_card_z_indexes():
+	var actual_index = player_hand.find(ActiveCard,0)
+	#array map example
+	var z_indexes = []
+	for i in range(player_hand.size()):
+		# Calculamos la distancia absoluta desde el índice actual hasta el central
+		var distancia = abs(i - actual_index)
+		# Restamos esa distancia al valor máximo
+		var z = player_hand.size() - distancia
+		player_hand[i].z_index = z
+	pass
 func update_hand_position():
 	for i in range(player_hand.size()):
 		var new_position = Vector2(calculate_card_position(i), HAND_Y_POSITION)
 		var card = player_hand[i]
 		card.get_node("DraggingArea").set_deferred("disabled", true)
-		var new_opacity = calculate_card_opacity(i)
+		var new_opacity = 1
 		animate_card_position_and_opacity(card, new_position, new_opacity)
+	if(!ActiveCard):
 		confTopItem()
-	
+func ManuallySelectCard(card):
+	ActiveCard.onTop = false
+	card.onTop = true
+	ActiveCard = card
+	updated_hand_card_z_indexes()
 func calculate_card_position(index):
 	# ✅ PARÉNTESIS CORRECTOS:
 	var total_width = (player_hand.size() - 1) * CARD_WIDTH
@@ -74,7 +96,8 @@ func animate_card_position_and_opacity(card, new_position, new_opacity):
 
 func confirmOnStackTop():
 	if player_hand is Array and player_hand.size() > 0:
-		return player_hand[0]
+		ActiveCard = player_hand[0]
+		return ActiveCard
 	elif player_hand == null:
 		return null
 	else:
@@ -95,6 +118,13 @@ func _input(event: InputEvent) -> void:
 		add_card_to_decK()
 	if Input.is_key_pressed(KEY_D):
 		remove_from_deck()
+	if Input.is_key_pressed(KEY_RIGHT):
+		ManuallySelectCard(get_next_card_based_on_array_position(player_hand.find(ActiveCard,0),false))
+		pass
+	if Input.is_key_pressed(KEY_LEFT):
+		ManuallySelectCard(get_next_card_based_on_array_position(player_hand.find(ActiveCard,0)))
+		pass
+	
 
 func add_card_to_decK():
 	var new_card = card_scene.instantiate()
@@ -145,8 +175,9 @@ func _finalize_card_removal(card: Node2D) -> void:
 	# Remover del array de la mano
 	var idx = player_hand.find(card)
 	if idx != -1:
+		var next_card = get_next_card_based_on_array_position(idx)
 		player_hand.remove_at(idx)
-	
+		ManuallySelectCard(next_card)
 	# Remover del árbol de nodos y liberar
 	if card.get_parent():
 		card.get_parent().remove_child(card)
@@ -165,11 +196,29 @@ func remove_from_deck() -> void:
 	
 	# ✅ Iniciar animación sin await → retorna inmediatamente
 	vanish_card_and_self_remove(last_element)
-
+func get_next_card_based_on_array_position(position,direction = true):
+	#direction bool , true,false (left/right)
+	var player_hand_size = player_hand.size() - 1
+	var direction_sum = position - 1 if direction  else position + 1
+	var card
+	if(player_hand_size > 0 && direction_sum < player_hand.size()):
+		if(direction_sum == -1):
+			return player_hand[player_hand_size]
+		else:
+			return player_hand[direction_sum]
+		pass
+	else:
+		return player_hand[0]
 # ============================================================================
 # FIN DE FUNCIONES CORREGIDAS
 # ============================================================================
 
 func _on_card_manager_reset_cards_position() -> void:
 	update_hand_position()
+	pass
+func _on_card_hover_off(card):
+	card.z_index = player_hand.size() + 1
+	pass
+func _on_card_hover_on(card):
+	card.z_index = player_hand.size() + 1
 	pass
