@@ -125,6 +125,11 @@ func _input(event: InputEvent) -> void:
 func add_card_to_decK():
 	var new_card = card_scene.instantiate()
 	new_card.name = "Card_%s" % player_hand.size()
+	if new_card.has_signal("hovered"):
+		new_card.hovered.connect(_on_card_hovered.bind(new_card))
+		pass
+	if new_card.has_signal("hovering_off"):
+		new_card.hovering_off.connect(_on_card_hovering_off.bind(new_card))
 	self.add_child(new_card)
 	add_card_to_hand(new_card)
 	set_card_z_index(new_card,player_hand.size(),HAND_COUNT)
